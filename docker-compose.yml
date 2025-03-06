@@ -1,0 +1,116 @@
+version: "3"
+services:
+  redis_init:
+    image: redis:7-alpine
+    depends_on:
+      redis_1:
+        condition: service_healthy
+      redis_2:
+        condition: service_healthy
+      redis_3:
+        condition: service_healthy
+      redis_4:
+        condition: service_healthy
+      redis_5:
+        condition: service_healthy
+      redis_6:
+        condition: service_healthy
+    command: redis-cli --cluster create redis_1:6379 redis_2:6379 redis_3:6379 redis_4:6379 redis_5:6379 redis_6:6379 --cluster-replicas 1 --cluster-yes
+
+  redis_1:
+    image: redis:7-alpine
+    hostname: redis_1
+    ports:
+      - 7001:6379
+    volumes:
+      - redis_1:/var/lib/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis_2:
+    image: redis:7-alpine
+    hostname: redis_2
+    ports:
+      - 7002:6379
+    volumes:
+      - redis_2:/var/lib/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis_3:
+    image: redis:7-alpine
+    hostname: redis_3
+    ports:
+      - 7003:6379
+    volumes:
+      - redis_3:/var/lib/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis_4:
+    image: redis:7-alpine
+    hostname: redis_4
+    ports:
+      - 7004:6379
+    volumes:
+      - redis_4:/var/lib/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis_5:
+    image: redis:7-alpine
+    hostname: redis_5
+    ports:
+      - 7005:6379
+    volumes:
+      - redis_5:/var/lib/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  redis_6:
+    image: redis:7-alpine
+    hostname: redis_6
+    ports:
+      - 7006:6379
+    volumes:
+      - redis_6:/var/lib/redis
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+volumes:
+  redis_1:
+  redis_2:
+  redis_3:
+  redis_4:
+  redis_5:
+  redis_6:
