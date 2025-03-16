@@ -1,0 +1,12 @@
+services:
+  base-redis:
+    image: redis:7-alpine
+    volumes:
+      - ./redis.conf:/redis.conf
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: redis-server /redis.conf
+
