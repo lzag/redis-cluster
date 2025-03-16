@@ -1,12 +1,32 @@
 name: redis-laravel-benchmark
 
 services:
-  benchmark:
+  standalone-benchmark:
     build:
-      context: .
+      context: ./php
       dockerfile: Dockerfile
     volumes:
-      - ./redis_benchmark.php:/app/redis_benchmark.php
+      - ./php/redis_benchmark.php:/app/redis_benchmark.php
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: /app/redis_benchmark.php standalone
+
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  cluster-benchmark:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - ./php/redis_benchmark.php:/app/redis_benchmark.php
     depends_on:
       redis_1:
         condition: service_healthy
@@ -21,7 +41,6 @@ services:
     environment:
       - CLUSTER_NODES=redis_1:6379 redis_2:6379 redis_3:6379 redis_4:6379 redis_5:6379 redis_6:6379
       - CLUSTER_REPLICAS=1
-      - REDIS_PORT=6379
     depends_on:
       redis_2:
         condition: service_healthy

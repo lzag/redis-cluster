@@ -3,12 +3,10 @@ services:
     image: redis:7-alpine
     volumes:
       - ./redis.conf:/redis.conf
-    environment:
-      - REDIS_PORT=6379
     healthcheck:
-      test: ["CMD", "redis-cli", "-p", "$REDIS_PORT", "ping"]
+      test: redis-cli ping
       interval: 1s
       timeout: 3s
       retries: 30
-    command: ["redis-server", "/redis.conf", "--port", "$REDIS_PORT"]
+    command: ["redis-server", "/redis.conf"]
 
