@@ -1,14 +1,23 @@
-name: redis-cluster
+name: redis-laravel-benchmark
 
 services:
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./redis_benchmark.php:/app/redis_benchmark.php
+    depends_on:
+      redis_1:
+        condition: service_healthy
+    command: /app/redis_benchmark.php cluster
+
   redis_1:
     image: redis:7-alpine
     hostname: redis_1
     volumes:
       - ./entrypoint.sh:/entrypoint.sh
       - ./redis.conf:/redis.conf
-    ports:
-      - 6380:6379
     environment:
       - CLUSTER_NODES=redis_1:6379 redis_2:6379 redis_3:6379 redis_4:6379 redis_5:6379 redis_6:6379
       - CLUSTER_REPLICAS=1
@@ -26,7 +35,7 @@ services:
         condition: service_healthy
     entrypoint: /entrypoint.sh
     healthcheck:
-      test: redis-cli -p 6380 ping
+      test: redis-cli ping
       interval: 1s
       timeout: 3s
       retries: 30
@@ -36,37 +45,27 @@ services:
       file: redis-base.yml
       service: base-redis
     hostname: redis_2
-    ports:
-      - 6381:6379
 
   redis_3:
     extends:
       file: redis-base.yml
       service: base-redis
     hostname: redis_3
-    ports:
-      - 6382:6379
 
   redis_4:
     extends:
       file: redis-base.yml
       service: base-redis
     hostname: redis_4
-    ports:
-      - 6383:6379
 
   redis_5:
     extends:
       file: redis-base.yml
       service: base-redis
     hostname: redis_5
-    ports:
-      - 6384:6379
 
   redis_6:
     extends:
       file: redis-base.yml
       service: base-redis
     hostname: redis_6
-    ports:
-      - 6385:6379

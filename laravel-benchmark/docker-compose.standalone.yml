@@ -1,0 +1,22 @@
+name: redis-laravel-benchmark
+
+services:
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./redis_benchmark.php:/app/redis_benchmark.php
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: /app/redis_benchmark.php standalone
+
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
