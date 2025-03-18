@@ -2,12 +2,6 @@
 
 [Read the post](https://lukaszzagroba.com/automating-redis-cluster-setup/)
 
-## Table of Contents
-
-- [Usage](#usage)
-- [Motivation](#motivation)
-- [Benchmarks](#benchmarks)
-
 ## Usage
 
 This will start a 3-node Redis cluster with 1 replica per node.
