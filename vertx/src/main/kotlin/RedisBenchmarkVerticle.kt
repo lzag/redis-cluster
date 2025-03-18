@@ -68,7 +68,6 @@ class RedisBenchmarkVerticle : CoroutineVerticle() {
         val totalTimeSec = totalTimeMs / 1000.0
         val throughput = totalOps / totalTimeSec
         println("Completed $totalOps operations in $totalTimeSec seconds ($throughput ops/sec)")
-        vertx.eventBus().publish("benchmark.done", "done")  // Signal completion
     }
 
     private suspend fun simulateUser(userId: Int) {
