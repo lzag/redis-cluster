@@ -20,7 +20,7 @@ function runBenchmark(string $mode): void
     Runtime::enableCoroutine();
     Coroutine\run(function () use ($mode, $concurrentUsers, $opsPerUser, &$startTimes, &$endTimes) {
         $standaloneConfig = ['host' => 'redis', 'port' => 6379];
-        $clusterConfig = ["redis_1:6379", "redis_2:6379", "redis_3:6379", "redis_4:6379", "redis_5:6379", "redis_6:6379"];
+        $clusterConfig = ["redis1:6379", "redis2:6379", "redis3:6379", "redis4:6379", "redis5:6379", "redis6:6379"];
 
         // Initialize connection pool
         $poolSize = $concurrentUsers;
@@ -33,6 +33,7 @@ function runBenchmark(string $mode): void
                 try {
                     $redis->connect($config['host'], $config['port']);
                     echo "Initialized Redis connection #$i ($mode mode)\n";
+                    $redisPool->push($redis);
                 } catch (\Throwable $e) {
                     echo "Failed to init connection #$i: {$e->getMessage()}\n";
                     exit(1);
@@ -40,22 +41,6 @@ function runBenchmark(string $mode): void
             }
         } else {
             $start = microtime(true);
-            while (microtime(true) - $start < 30) {
-                try {
-                    $redis = new RedisCluster(NULL, $clusterConfig, 1.5, 1.5, true);
-                    $info = $redis->cluster('1', 'INFO');
-                    if (strpos($info, 'cluster_state:ok') !== false) {
-                        echo "Cluster is ready!\n";
-                        $redis->close();
-                        break;
-                    }
-                    echo "Waiting for cluster to be ready...\n";
-                    usleep(500000);
-                } catch (\Throwable $e) {
-                    echo "Cluster check failed: {$e->getMessage()}\n";
-                    usleep(500000);
-                }
-            }
             for ($i = 0; $i < $poolSize; $i++) {
                 $redis = new RedisCluster(NULL, $clusterConfig, 1.5, 1.5, true);
                 try {

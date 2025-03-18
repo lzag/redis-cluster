@@ -25,6 +25,19 @@ wait_for_redis() {
     exit 1
 }
 
+wait_for_cluster() {
+    echo "Waiting for cluster to be ready..."
+    for i in $(seq 1 30); do
+        if redis-cli -h "${CLUSTER_NODES%% *}" CLUSTER INFO | grep -q "cluster_state:ok"; then  # Check first node
+            echo "Cluster ready."
+            return 0
+        fi
+        sleep 1
+    done
+    echo "Cluster failed to stabilize after 30s."
+    exit 1
+}
+
 validate_node_count() {
     NODE_COUNT=$(echo "$CLUSTER_NODES" | wc -w)  # Number of nodes in CLUSTER_NODES
     MIN_MASTERS=3  # Minimum number of masters for a Redis cluster
@@ -70,6 +83,7 @@ if [ -n "$CLUSTER_NODES" ] && [ ! -f "$INIT_FLAG" ]; then
         wait_for_redis
         validate_node_count
         create_and_configure_cluster
+        wait_for_cluster
     ) &
 fi
 

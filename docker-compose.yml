@@ -1,72 +1,56 @@
 name: redis-cluster
 
 services:
-  redis_1:
+  redis1:
     image: redis:7-alpine
-    hostname: redis_1
     volumes:
       - ./entrypoint.sh:/entrypoint.sh
       - ./redis.conf:/redis.conf
-    ports:
-      - 6380:6379
     environment:
-      - CLUSTER_NODES=redis_1:6379 redis_2:6379 redis_3:6379 redis_4:6379 redis_5:6379 redis_6:6379
+      - CLUSTER_NODES=redis1:6379 redis2:6379 redis3:6379 redis4:6379 redis5:6379 redis6:6379
       - CLUSTER_REPLICAS=1
-      - REDIS_PORT=6379
+#       alternative with no replication
+#      - CLUSTER_NODES=redis1:6379 redis2:6379 redis3:6379
+#      - CLUSTER_REPLICAS=0
     depends_on:
-      redis_2:
+      redis2:
         condition: service_healthy
-      redis_3:
+      redis3:
         condition: service_healthy
-      redis_4:
+      redis4:
         condition: service_healthy
-      redis_5:
+      redis5:
         condition: service_healthy
-      redis_6:
+      redis6:
         condition: service_healthy
     entrypoint: /entrypoint.sh
     healthcheck:
-      test: redis-cli -p 6380 ping
+      test: redis-cli ping
       interval: 1s
       timeout: 3s
       retries: 30
 
-  redis_2:
+  redis2:
     extends:
       file: redis-base.yml
       service: base-redis
-    hostname: redis_2
-    ports:
-      - 6381:6379
 
-  redis_3:
+  redis3:
     extends:
       file: redis-base.yml
       service: base-redis
-    hostname: redis_3
-    ports:
-      - 6382:6379
 
-  redis_4:
+  redis4:
     extends:
       file: redis-base.yml
       service: base-redis
-    hostname: redis_4
-    ports:
-      - 6383:6379
 
-  redis_5:
+  redis5:
     extends:
       file: redis-base.yml
       service: base-redis
-    hostname: redis_5
-    ports:
-      - 6384:6379
 
-  redis_6:
+  redis6:
     extends:
       file: redis-base.yml
       service: base-redis
-    hostname: redis_6
-    ports:
-      - 6385:6379

@@ -1,0 +1,62 @@
+name: redis-laravel-benchmark
+
+include:
+  - docker-compose.yml
+
+services:
+  vertx-standalone-benchmark:
+    build:
+      context: ./vertx
+    environment:
+      - MODE=standalone
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - standalone
+
+  vertx-cluster-benchmark:
+    build:
+      context: ./vertx
+    environment:
+      - MODE=cluster
+    depends_on:
+      redis1:
+        condition: service_healthy
+
+  php-standalone-benchmark:
+    build:
+      context: ./php
+    volumes:
+      - ./php/redis_benchmark.php:/app/redis_benchmark.php
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: /app/redis_benchmark.php standalone
+    networks:
+      - standalone
+
+  php-cluster-benchmark:
+    build:
+      context: ./php
+    volumes:
+      - ./php/redis_benchmark.php:/app/redis_benchmark.php
+    depends_on:
+      redis1:
+        condition: service_healthy
+    command: /app/redis_benchmark.php cluster
+
+  redis:
+    image: redis:7-alpine
+    hostname: redis
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - standalone
+
+networks:
+  standalone:
+    driver: bridge

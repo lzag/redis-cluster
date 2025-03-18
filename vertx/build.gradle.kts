@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.10"
     application
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 group = "com.lzag"
@@ -11,6 +12,11 @@ repositories {
 }
 val vertxVer = "4.5.13"
 
+tasks.shadowJar {
+    archiveBaseName = "vertx-benchmark"
+}
+
+
 dependencies {
     implementation("io.vertx:vertx-core:$vertxVer")
     implementation("io.vertx:vertx-redis-client:$vertxVer")
@@ -20,7 +26,8 @@ dependencies {
 }
 
 application {
-    mainClass.set("RedisBenchmarkVerticleKt") // Kotlin generates this class for top-level main
+//    mainClass.set("RedisBenchmarkVerticleKt") // Kotlin generates this class for top-level main
+    mainClass.set("com.lzag.redisbenchmark.RedisBenchmark")
 }
 
 kotlin {
